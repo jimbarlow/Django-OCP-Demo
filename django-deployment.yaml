@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: secu2
+    app.openshift.io/runtime: django
+  name: secu2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: secu2
+  volumes:
+  - name: django-inst
+    emptyDir: {}
+  template:
+    metadata:
+      labels:
+        app: secu2
+        deploymentconfig: secu2
+    spec:
+      # serviceAccountName: secu-sa
+      initContainers:
+      - name: migrate
+        image: quay.jimbarlow.com/barlowco/secu-django-postgres:v2
+        command: [ "/usr/local/bin/python3" ]
+        args: [ "manage.py", "migrate" ]
+        restartPolicy: "Never"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: secu-django-postgres
+      - name: superuser
+        image: quay.jimbarlow.com/barlowco/secu-django-postgres:v2
+        command: [ "/bin/bash" ]
+        args: [ "createsuperuser.sh" ]
+        restartPolicy: "Never"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: secu-django-postgres
+      containers:
+      - name: secu2
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 500m
+          requests:
+            memory: 200Mi
+            cpu: 200m
+        # imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always        
+        image: quay.jimbarlow.com/barlowco/secu-django-postgres:v2
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        restartPolicy: Always
+        command: [ "gunicorn", "--bind", ":8080", "--workers", "3", "django_diy_blog.wsgi:application" ]
+        envFrom:
+        - configMapRef:
+            name: secu-django-postgres
+

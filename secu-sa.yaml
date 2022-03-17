@@ -1,0 +1,7 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: secu-sa
+  namespace: b-django-test
+  labels:
+    app: secu2-app

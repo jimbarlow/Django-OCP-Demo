@@ -1,0 +1,13 @@
+---
+- name: find-if-host-is-up
+  hosts: master0.ocp4.jimbarlow.com
+  gather_facts: no
+  tasks:
+    - name: Check if host is accessible
+      wait_for: host={{ inventory_hostname }} port=22 timeout=3
+      register: host_accessible
+      failed_when: False
+    - name: results
+      debug:
+        var: host_accessible
+      

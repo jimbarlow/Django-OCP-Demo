@@ -1,0 +1,13 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: secu-django-postgres
+  namespace: secu-django
+data:
+  DB_HOST: '192.168.30.52'
+  DB_NAME: django4
+  DB_USER: postgres
+  DJANGO_SUPERUSER_EMAIL: heyyou@example.com
+  DJANGO_SUPERUSER_USERNAME: administrator
+  DJANGO_SUPERUSER_PASSWORD: 'ke9zd!214'
+  DB_PASSWORD: 'ke9zd!214'
